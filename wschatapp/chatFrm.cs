@@ -31,24 +31,7 @@ namespace wschatapp
 
         private void Server_OnMessage(object sender, MessageEventArgs e)
         {
-            while (!Disposing)
-            {
-                if (server.IsAlive)
-                {
-                    Task.Delay(1000);
-                    continue;
-                }
-                try
-                {
-                    string message = e.Data;
-
-                    lstMessages.Items.Add(message);
-                }
-                catch (Exception ex)
-                {
-
-                }
-            }
+            lstMessages.Items.Add(e.Data);
         }
 
         private async void btnSend_Click(object sender, EventArgs e)
