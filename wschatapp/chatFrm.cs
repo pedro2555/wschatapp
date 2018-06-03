@@ -1,5 +1,5 @@
 ﻿using System.Windows.Forms;
-using System.Net.WebSockets;
+using WebSocketSharp;
 using System.Threading;
 using System;
 using System.Threading.Tasks;
@@ -10,29 +10,38 @@ namespace wschatapp
     {
         string Url;
 
-        ClientWebSocket server;
+        private WebSocket server;
 
         public chatFrm()
         {
             //Url = @"wss://echo.websocket.org";
-            Url = @"wss://fa-live.herokuapp.com/echo";
-            //Url = @"ws://localhost:8000/echo";
-            server = new ClientWebSocket();
+            server = new WebSocket(@"wss://fa-live.herokuapp.com/echo");
+
+            server.OnMessage += Server_OnMessage;
 
             InitializeComponent();
 
-            Connect();
+            server.Connect();
 
-            if (server.State == WebSocketState.Connecting)
+            if (server.IsAlive)
                 lstMessages.Items.Add(string.Format(
-                    "Connecting to {0}", Url));
+                    "Connecting to {0}", server.Url));
 
-            AsyncReceiveLoop();
         }
 
-        private async void Connect()
+        private void Server_OnMessage(object sender, MessageEventArgs e)
         {
-            await server.ConnectAsync(new Uri(Url), CancellationToken.None);
+            if (InvokeRequired)
+            {
+                Invoke(
+                    new Action<object, MessageEventArgs>(Server_OnMessage),
+                    sender,
+                    e);
+
+                return;
+            }
+
+            lstMessages.Items.Add(e.Data);
         }
 
         private async void btnSend_Click(object sender, EventArgs e)
@@ -40,33 +49,11 @@ namespace wschatapp
             txtMessage.Enabled = false;
             btnSend.Enabled = false;
 
-            await server.SendAsync(txtMessage.Text);
+            server.Send(txtMessage.Text);
 
             txtMessage.Text = "";
             txtMessage.Enabled = true;
             btnSend.Enabled = true;
-        }
-
-        private async void AsyncReceiveLoop()
-        {
-            while (!Disposing)
-            {
-                if (server.State != WebSocketState.Open)
-                {
-                    await Task.Delay(1000);
-                    continue;
-                }
-                try
-                {
-                    string message = await server.ReceiveAsync();
-
-                    lstMessages.Items.Add(message);
-                }
-                catch (Exception ex)
-                {
-
-                }
-            }
-        }
+        }       
     }
 }
