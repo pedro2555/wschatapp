@@ -20,6 +20,8 @@ namespace wschatapp
             rxServer = new WebSocket(Url + "/rx");
 
             rxServer.OnMessage += Server_OnMessage;
+            rxServer.OnClose += Server_OnClose;
+            txServer.OnClose += Server_OnClose;
 
             InitializeComponent();
 
@@ -32,6 +34,12 @@ namespace wschatapp
                 lstMessages.Items.Add(string.Format(
                     "Connecting to {0}", txServer.Url));
 
+        }
+
+        private void Server_OnClose(object sender, CloseEventArgs e)
+        {
+            WebSocket _ws = (WebSocket)sender;
+            _ws.Connect();
         }
 
         private void Server_OnMessage(object sender, MessageEventArgs e)
