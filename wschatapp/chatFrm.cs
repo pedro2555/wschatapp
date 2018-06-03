@@ -8,14 +8,20 @@ namespace wschatapp
     {
         string Url;
 
-        private WebSocketWrapper txServer, rxServer;
+        private WebSocketWrapper server;
 
-        public chatFrm()
+        public string Username
+        { get; private set; }
+
+        public chatFrm(string username)
         {
-            Url = @"wss://fa-live.herokuapp.com";
+            Username = username;
+            Text = "Chat App - " + Username;
 
-            txServer = new WebSocketWrapper(Url + "/tx");
-            rxServer = new WebSocketWrapper(Url + "/rx");
+            Url = @"wss://fa-live.herokuapp.com";
+            Url = @"ws://localhost:8000";
+
+            server = new WebSocketWrapper(Url + "/chat");
 
             InitializeComponent();
 
@@ -24,22 +30,18 @@ namespace wschatapp
 
         private async void Connect()
         {
-            lstMessages.Items.Add(string.Format(
-                "Connecting to {0}...", Url));
-
-            await Task.WhenAll(txServer.Connect(), rxServer.Connect());
+            await server.Connect();
 
             txtMessage.Enabled = true;
             btnSend.Enabled = true;
 
-            await rxServer.Send(""); 
-
-            lstMessages.Items.Add(string.Format(
-                "Connected to {0}.", Url));
+            await server.Send<ChatMessage>(new ChatMessage(
+                Username,
+                "Joined the chat")); 
 
             while (true)
             {
-                ChatMessage msg = await rxServer.Receive<ChatMessage>();
+                ChatMessage msg = await server.Receive<ChatMessage>();
                 lstMessages.Items.Add(msg.ToString());
             }
         }
@@ -48,10 +50,8 @@ namespace wschatapp
             txtMessage.Enabled = false;
             btnSend.Enabled = false;
 
-            lstMessages.Items.Add("Disconnecting...");
-
-            //txServer.Close();
-            //rxServer.Close();
+            server.Close();
+            server.Close();
         }
 
         private async void btnSend_Click(object sender, EventArgs e)
@@ -59,7 +59,7 @@ namespace wschatapp
             txtMessage.Enabled = false;
             btnSend.Enabled = false;
 
-            await txServer.Send<ChatMessage>(new ChatMessage(txtName.Text, txtMessage.Text));
+            await server.Send<ChatMessage>(new ChatMessage(Username, txtMessage.Text));
 
             txtMessage.Text = "";
             txtMessage.Enabled = true;

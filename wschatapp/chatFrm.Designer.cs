@@ -31,7 +31,6 @@
             this.lstMessages = new System.Windows.Forms.ListBox();
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.btnSend = new System.Windows.Forms.Button();
-            this.txtName = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // lstMessages
@@ -45,9 +44,9 @@
             // txtMessage
             // 
             this.txtMessage.Enabled = false;
-            this.txtMessage.Location = new System.Drawing.Point(170, 373);
+            this.txtMessage.Location = new System.Drawing.Point(12, 373);
             this.txtMessage.Name = "txtMessage";
-            this.txtMessage.Size = new System.Drawing.Size(409, 20);
+            this.txtMessage.Size = new System.Drawing.Size(567, 20);
             this.txtMessage.TabIndex = 1;
             // 
             // btnSend
@@ -61,20 +60,11 @@
             this.btnSend.UseVisualStyleBackColor = true;
             this.btnSend.Click += new System.EventHandler(this.btnSend_Click);
             // 
-            // txtName
-            // 
-            this.txtName.Location = new System.Drawing.Point(12, 373);
-            this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(152, 20);
-            this.txtName.TabIndex = 3;
-            this.txtName.Text = "Your Name";
-            // 
             // chatFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(672, 403);
-            this.Controls.Add(this.txtName);
             this.Controls.Add(this.btnSend);
             this.Controls.Add(this.txtMessage);
             this.Controls.Add(this.lstMessages);
@@ -91,7 +81,6 @@
         private System.Windows.Forms.ListBox lstMessages;
         private System.Windows.Forms.TextBox txtMessage;
         private System.Windows.Forms.Button btnSend;
-        private System.Windows.Forms.TextBox txtName;
     }
 }
 

@@ -67,6 +67,12 @@
     <Compile Include="ClientWebSocket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="usernameFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="usernameFrm.Designer.cs">
+      <DependentUpon>usernameFrm.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebSocketWrapper.cs" />
     <EmbeddedResource Include="chatFrm.resx">
       <DependentUpon>chatFrm.cs</DependentUpon>
@@ -80,6 +86,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="usernameFrm.resx">
+      <DependentUpon>usernameFrm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
