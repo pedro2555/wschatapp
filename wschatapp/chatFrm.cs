@@ -1,5 +1,5 @@
 ﻿using System.Windows.Forms;
-using System.Net.WebSockets;
+using WebSocketSharp;
 using System.Threading;
 using System;
 using System.Threading.Tasks;
@@ -10,55 +10,37 @@ namespace wschatapp
     {
         string Url;
 
-        ClientWebSocket server;
+        private WebSocket server;
 
         public chatFrm()
         {
             //Url = @"wss://echo.websocket.org";
-            Url = @"wss://fa-live.herokuapp.com/echo";
-            //Url = @"ws://localhost:8000/echo";
-            server = new ClientWebSocket();
+            server = new WebSocket(@"wss://fa-live.herokuapp.com/echo");
+
+            server.OnMessage += Server_OnMessage;
 
             InitializeComponent();
 
-            Connect();
+            server.Connect();
 
-            if (server.State == WebSocketState.Connecting)
+            if (server.ReadyState == WebSocketState.Connecting)
                 lstMessages.Items.Add(string.Format(
                     "Connecting to {0}", Url));
 
-            AsyncReceiveLoop();
         }
 
-        private async void Connect()
-        {
-            await server.ConnectAsync(new Uri(Url), CancellationToken.None);
-        }
-
-        private async void btnSend_Click(object sender, EventArgs e)
-        {
-            txtMessage.Enabled = false;
-            btnSend.Enabled = false;
-
-            await server.SendAsync(txtMessage.Text);
-
-            txtMessage.Text = "";
-            txtMessage.Enabled = true;
-            btnSend.Enabled = true;
-        }
-
-        private async void AsyncReceiveLoop()
+        private void Server_OnMessage(object sender, MessageEventArgs e)
         {
             while (!Disposing)
             {
-                if (server.State != WebSocketState.Open)
+                if (server.ReadyState != WebSocketState.Open)
                 {
-                    await Task.Delay(1000);
+                    Task.Delay(1000);
                     continue;
                 }
                 try
                 {
-                    string message = await server.ReceiveAsync();
+                    string message = e.Data;
 
                     lstMessages.Items.Add(message);
                 }
@@ -68,5 +50,17 @@ namespace wschatapp
                 }
             }
         }
+
+        private async void btnSend_Click(object sender, EventArgs e)
+        {
+            txtMessage.Enabled = false;
+            btnSend.Enabled = false;
+
+            server.Send(txtMessage.Text);
+
+            txtMessage.Text = "";
+            txtMessage.Enabled = true;
+            btnSend.Enabled = true;
+        }       
     }
 }
