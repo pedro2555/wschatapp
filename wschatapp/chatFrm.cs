@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace wschatapp
@@ -26,8 +27,10 @@ namespace wschatapp
             lstMessages.Items.Add(string.Format(
                 "Connecting to {0}...", Url));
 
-            await txServer.Connect();
-            await rxServer.Connect();
+            await Task.WhenAll(txServer.Connect(), rxServer.Connect());
+
+            txtMessage.Enabled = true;
+            btnSend.Enabled = true;
 
             await rxServer.Send("");
 
@@ -36,6 +39,16 @@ namespace wschatapp
 
             while (true)
                 lstMessages.Items.Add(await rxServer.Receive());
+        }
+        private void chatFrm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            txtMessage.Enabled = false;
+            btnSend.Enabled = false;
+
+            lstMessages.Items.Add("Disconnecting...");
+
+            txServer.Close();
+            rxServer.Close();
         }
 
         private async void btnSend_Click(object sender, EventArgs e)

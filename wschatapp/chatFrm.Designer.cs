@@ -43,6 +43,7 @@
             // 
             // txtMessage
             // 
+            this.txtMessage.Enabled = false;
             this.txtMessage.Location = new System.Drawing.Point(12, 373);
             this.txtMessage.Name = "txtMessage";
             this.txtMessage.Size = new System.Drawing.Size(567, 20);
@@ -50,6 +51,7 @@
             // 
             // btnSend
             // 
+            this.btnSend.Enabled = false;
             this.btnSend.Location = new System.Drawing.Point(585, 371);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(75, 23);
@@ -68,6 +70,7 @@
             this.Controls.Add(this.lstMessages);
             this.Name = "chatFrm";
             this.Text = "Chat App";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.chatFrm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -71,6 +71,11 @@ namespace wschatapp
             await connectTask.Task;
         }
 
+        public void Close()
+        {
+            ws.CloseAsync();
+        }
+
         public async Task Send(string data)
         {
             if (connectTask != null &&
