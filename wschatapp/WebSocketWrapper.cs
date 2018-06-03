@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
@@ -12,7 +9,7 @@ namespace wschatapp
         public string Url
         { get; private set; }
 
-        public WebSocket ws;
+        private WebSocket ws;
 
         private TaskCompletionSource<object> connectTask;
         private TaskCompletionSource<string> receiveTask;
