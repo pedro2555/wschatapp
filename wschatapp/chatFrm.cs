@@ -32,13 +32,16 @@ namespace wschatapp
             txtMessage.Enabled = true;
             btnSend.Enabled = true;
 
-            await rxServer.Send("");
+            await rxServer.Send(""); 
 
             lstMessages.Items.Add(string.Format(
                 "Connected to {0}.", Url));
 
             while (true)
-                lstMessages.Items.Add(await rxServer.Receive());
+            {
+                ChatMessage msg = await rxServer.Receive<ChatMessage>();
+                lstMessages.Items.Add(msg.ToString());
+            }
         }
         private void chatFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -47,8 +50,8 @@ namespace wschatapp
 
             lstMessages.Items.Add("Disconnecting...");
 
-            txServer.Close();
-            rxServer.Close();
+            //txServer.Close();
+            //rxServer.Close();
         }
 
         private async void btnSend_Click(object sender, EventArgs e)
@@ -56,7 +59,7 @@ namespace wschatapp
             txtMessage.Enabled = false;
             btnSend.Enabled = false;
 
-            await txServer.Send(txtMessage.Text);
+            await txServer.Send<ChatMessage>(new ChatMessage(txtName.Text, txtMessage.Text));
 
             txtMessage.Text = "";
             txtMessage.Enabled = true;

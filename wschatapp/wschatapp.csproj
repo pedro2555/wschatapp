@@ -63,6 +63,7 @@
     <Compile Include="chatFrm.Designer.cs">
       <DependentUpon>chatFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChatMessage.cs" />
     <Compile Include="ClientWebSocket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

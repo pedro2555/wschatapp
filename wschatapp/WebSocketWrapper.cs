@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Threading.Tasks;
 using WebSocketSharp;
 
@@ -82,6 +83,11 @@ namespace wschatapp
             await Task.Run(new Action(() => { ws.Send(data); }));
         }
 
+        public async Task Send<T>(object data)
+        {
+            await Send(JsonConvert.SerializeObject(data));
+        }
+
         public async Task<string> Receive()
         {
             if (connectTask != null &&
@@ -91,6 +97,11 @@ namespace wschatapp
             receiveTask = new TaskCompletionSource<string>();
 
             return await receiveTask.Task;
+        }
+
+        public async Task<T> Receive<T>()
+        {
+            return JsonConvert.DeserializeObject<T>(await Receive());
         }
     }
 }
