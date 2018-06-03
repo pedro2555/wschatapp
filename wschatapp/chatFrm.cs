@@ -19,7 +19,6 @@ namespace wschatapp
             Text = "Chat App - " + Username;
 
             Url = @"wss://fa-live.herokuapp.com";
-            Url = @"ws://localhost:8000";
 
             server = new WebSocketWrapper(Url + "/chat");
 
