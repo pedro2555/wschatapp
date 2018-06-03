@@ -16,8 +16,6 @@ namespace wschatapp
             txServer = new WebSocketWrapper(Url + "/tx");
             rxServer = new WebSocketWrapper(Url + "/rx");
 
-            rxServer.OnMessage += Server_OnMessage;
-
             InitializeComponent();
 
             Connect();
@@ -35,21 +33,9 @@ namespace wschatapp
 
             lstMessages.Items.Add(string.Format(
                 "Connected to {0}.", Url));
-        }
 
-        private void Server_OnMessage(object sender, string e)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(
-                    new Action<object, string>(Server_OnMessage),
-                    sender,
-                    e);
-
-                return;
-            }
-
-            lstMessages.Items.Add(e);
+            while (true)
+                lstMessages.Items.Add(await rxServer.Receive());
         }
 
         private async void btnSend_Click(object sender, EventArgs e)

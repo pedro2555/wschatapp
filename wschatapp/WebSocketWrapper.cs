@@ -12,17 +12,14 @@ namespace wschatapp
         public string Url
         { get; private set; }
 
-        private WebSocket ws;
+        public WebSocket ws;
 
         private TaskCompletionSource<object> connectTask;
-
-        public event EventHandler<string> OnMessage;
+        private TaskCompletionSource<string> receiveTask;
 
         public WebSocketWrapper(string url)
         {
             Url = url;
-
-            connectTask = new TaskCompletionSource<object>();
 
             ws = new WebSocket(Url);
 
@@ -34,29 +31,41 @@ namespace wschatapp
 
         private void Ws_OnMessage(object sender, MessageEventArgs e)
         {
-            OnMessage(sender, e.Data);
+            if (receiveTask != null &&
+                receiveTask.Task.Status == TaskStatus.WaitingForActivation)
+                receiveTask.SetResult(e.Data);
         }
 
         private void Ws_OnError(object sender, ErrorEventArgs e)
         {
-            if (connectTask.Task.Status == TaskStatus.Running)
+            if (connectTask != null &&
+                connectTask.Task.Status == TaskStatus.WaitingForActivation)
                 connectTask.SetException(e.Exception);
+
+            if (receiveTask != null &&
+                receiveTask.Task.Status == TaskStatus.WaitingForActivation)
+                receiveTask.SetException(e.Exception);
         }
 
         private void Ws_OnOpen(object sender, EventArgs e)
         {
-            if (connectTask.Task.Status == TaskStatus.WaitingForActivation)
+            if (connectTask != null &&
+                connectTask.Task.Status == TaskStatus.WaitingForActivation)
                 connectTask.SetResult(null);
         }
 
-        private void Ws_OnClose(object sender, CloseEventArgs e)
+        private async void Ws_OnClose(object sender, CloseEventArgs e)
         {
-            WebSocket _ws = (WebSocket)sender;
-            _ws.Connect();
+            if (e.WasClean)
+                return;
+
+            await Connect();
         }
 
         public async Task Connect()
         {
+            connectTask = new TaskCompletionSource<object>();
+
             ws.Connect();
 
             await connectTask.Task;
@@ -64,7 +73,22 @@ namespace wschatapp
 
         public async Task Send(string data)
         {
+            if (connectTask != null &&
+                connectTask.Task.Status == TaskStatus.WaitingForActivation)
+                await connectTask.Task;
+            
             await Task.Run(new Action(() => { ws.Send(data); }));
+        }
+
+        public async Task<string> Receive()
+        {
+            if (connectTask != null &&
+                connectTask.Task.Status == TaskStatus.WaitingForActivation)
+                await connectTask.Task;
+
+            receiveTask = new TaskCompletionSource<string>();
+
+            return await receiveTask.Task;
         }
     }
 }
