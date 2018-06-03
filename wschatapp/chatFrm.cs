@@ -1,8 +1,5 @@
-﻿using System.Windows.Forms;
-using WebSocketSharp;
-using System.Threading;
-using System;
-using System.Threading.Tasks;
+﻿using System;
+using System.Windows.Forms;
 
 namespace wschatapp
 {
@@ -10,51 +7,49 @@ namespace wschatapp
     {
         string Url;
 
-        private WebSocket txServer, rxServer;
+        private WebSocketWrapper txServer, rxServer;
 
         public chatFrm()
         {
             Url = @"wss://fa-live.herokuapp.com";
 
-            txServer = new WebSocket(Url + "/tx");
-            rxServer = new WebSocket(Url + "/rx");
+            txServer = new WebSocketWrapper(Url + "/tx");
+            rxServer = new WebSocketWrapper(Url + "/rx");
 
             rxServer.OnMessage += Server_OnMessage;
-            rxServer.OnClose += Server_OnClose;
-            txServer.OnClose += Server_OnClose;
 
             InitializeComponent();
 
-            txServer.Connect();
-
-            rxServer.Connect();
-            rxServer.Send("");
-
-            if (txServer.IsAlive)
-                lstMessages.Items.Add(string.Format(
-                    "Connecting to {0}", txServer.Url));
-
+            Connect();
         }
 
-        private void Server_OnClose(object sender, CloseEventArgs e)
+        private async void Connect()
         {
-            WebSocket _ws = (WebSocket)sender;
-            _ws.Connect();
+            lstMessages.Items.Add(string.Format(
+                "Connecting to {0}...", Url));
+
+            await txServer.Connect();
+            await rxServer.Connect();
+
+            await rxServer.Send("");
+
+            lstMessages.Items.Add(string.Format(
+                "Connected to {0}.", Url));
         }
 
-        private void Server_OnMessage(object sender, MessageEventArgs e)
+        private void Server_OnMessage(object sender, string e)
         {
             if (InvokeRequired)
             {
                 Invoke(
-                    new Action<object, MessageEventArgs>(Server_OnMessage),
+                    new Action<object, string>(Server_OnMessage),
                     sender,
                     e);
 
                 return;
             }
 
-            lstMessages.Items.Add(e.Data);
+            lstMessages.Items.Add(e);
         }
 
         private async void btnSend_Click(object sender, EventArgs e)
@@ -62,7 +57,7 @@ namespace wschatapp
             txtMessage.Enabled = false;
             btnSend.Enabled = false;
 
-            txServer.Send(txtMessage.Text);
+            await txServer.Send(txtMessage.Text);
 
             txtMessage.Text = "";
             txtMessage.Enabled = true;

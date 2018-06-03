@@ -66,6 +66,7 @@
     <Compile Include="ClientWebSocket.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebSocketWrapper.cs" />
     <EmbeddedResource Include="chatFrm.resx">
       <DependentUpon>chatFrm.cs</DependentUpon>
     </EmbeddedResource>
