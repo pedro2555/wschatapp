@@ -23,9 +23,9 @@ namespace wschatapp
 
             server.Connect();
 
-            if (server.ReadyState == WebSocketState.Connecting)
+            if (server.IsAlive)
                 lstMessages.Items.Add(string.Format(
-                    "Connecting to {0}", Url));
+                    "Connecting to {0}", server.Url));
 
         }
 
@@ -33,7 +33,7 @@ namespace wschatapp
         {
             while (!Disposing)
             {
-                if (server.ReadyState != WebSocketState.Open)
+                if (server.IsAlive)
                 {
                     Task.Delay(1000);
                     continue;
