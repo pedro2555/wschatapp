@@ -10,22 +10,27 @@ namespace wschatapp
     {
         string Url;
 
-        private WebSocket server;
+        private WebSocket txServer, rxServer;
 
         public chatFrm()
         {
-            //Url = @"wss://echo.websocket.org";
-            server = new WebSocket(@"wss://fa-live.herokuapp.com/echo");
+            Url = @"wss://fa-live.herokuapp.com";
 
-            server.OnMessage += Server_OnMessage;
+            txServer = new WebSocket(Url + "/tx");
+            rxServer = new WebSocket(Url + "/rx");
+
+            rxServer.OnMessage += Server_OnMessage;
 
             InitializeComponent();
 
-            server.Connect();
+            txServer.Connect();
 
-            if (server.IsAlive)
+            rxServer.Connect();
+            rxServer.Send("");
+
+            if (txServer.IsAlive)
                 lstMessages.Items.Add(string.Format(
-                    "Connecting to {0}", server.Url));
+                    "Connecting to {0}", txServer.Url));
 
         }
 
@@ -49,7 +54,7 @@ namespace wschatapp
             txtMessage.Enabled = false;
             btnSend.Enabled = false;
 
-            server.Send(txtMessage.Text);
+            txServer.Send(txtMessage.Text);
 
             txtMessage.Text = "";
             txtMessage.Enabled = true;
